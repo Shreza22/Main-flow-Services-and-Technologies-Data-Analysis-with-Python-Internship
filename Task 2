@@ -1,0 +1,77 @@
+import pandas as pd
+df=pd.read_csv('C:\\Users\\91733\\Downloads\\01.Data Cleaning and Preprocessing.csv')
+df
+df.head()
+df.info
+df.nunique
+# Filter rows where Y-Kappa is greater than 25
+filtered_df = df[df['Y-Kappa'] > 25]
+filtered_df
+filtered_df = df[(df['Y-Kappa'] > 25) & (df['ChipRate'] > 15)]
+filtered_df
+filtered_df = df[(df['Y-Kappa'] > 25) | (df['ChipRate'] > 15)]
+filtered_df
+filtered_df = df[df['Observation'] == '31-01:00']
+filtered_df
+# Filter rows where 'Observation' contains '31'
+filtered_df = df[df['Observation'].str.contains('31')]
+filtered_df
+# Ensure columns are present and properly named
+if 'Y-Kappa' in df.columns and 'ChipRate' in df.columns and 'SulphidityL-4' in df.columns:
+    # Filter rows where Y-Kappa > 25, ChipRate > 15, and SulphidityL-4 is not missing
+    filtered_df = df[(df['Y-Kappa'] > 25) & (df['ChipRate'] > 15) & (df['SulphidityL-4'].notna())]
+    # Display the first few rows of the filtered DataFrame
+    print(filtered_df.head())
+else:
+    print("One or more columns are missing in the DataFrame.")
+# Display the first few rows of the filtered DataFrame
+print(filtered_df.head())
+missing_values = filtered_df.isnull().sum()
+missing_values
+df_dropped_rows = df.dropna()
+df_dropped_rows
+df_dropped_columns = df.dropna(axis=1)
+df_dropped_columns
+df_filled_value = df.fillna(0)  # Fills all NaNs with 0
+df_filled_value
+# Fill with the mean of each column
+df_filled_mean = df.fillna(df.mean())
+df_filled_mean
+# Calculate summary statistics for all numerical columns
+summary_stats = df.describe()
+# Display the summary statistics
+print(summary_stats)
+print(df.columns)
+# Mean
+mean_y_kappa = df['Y-Kappa'].mean()
+mean_chiprate = df['ChipRate'].mean()
+
+# Median
+median_y_kappa = df['Y-Kappa'].median()
+median_chiprate = df['ChipRate'].median()
+
+# Standard Deviation
+std_y_kappa = df['Y-Kappa'].std()
+std_chiprate = df['ChipRate'].std()
+
+# Display the results
+print(f"Mean Y-Kappa: {mean_y_kappa}")
+print(f"Median Y-Kappa: {median_y_kappa}")
+print(f"Standard Deviation Y-Kappa: {std_y_kappa}")
+
+print(f"Mean ChipRate: {mean_chiprate}")
+print(f"Median ChipRate: {median_chiprate}")
+print(f"Standard Deviation ChipRate: {std_chiprate}")
+# Variance
+variance_y_kappa = df['Y-Kappa'].var()
+
+# Skewness
+skewness_y_kappa = df['Y-Kappa'].skew()
+
+# Kurtosis
+kurtosis_y_kappa = df['Y-Kappa'].kurt()
+
+# Display the results
+print(f"Variance Y-Kappa: {variance_y_kappa}")
+print(f"Skewness Y-Kappa: {skewness_y_kappa}")
+print(f"Kurtosis Y-Kappa: {kurtosis_y_kappa}")
