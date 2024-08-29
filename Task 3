@@ -1,0 +1,68 @@
+import pandas as pd
+from sklearn.model_selection import train_test_split, GridSearchCV
+from sklearn.preprocessing import StandardScaler
+from sklearn.linear_model import LogisticRegression
+from sklearn.metrics import accuracy_score, precision_score, recall_score, confusion_matrix
+
+# Step 1: Load the dataset
+file_path = '/mnt/data/DATA - 3.csv'
+df = pd.read_csv(file_path)
+
+# Step 2: Data Preprocessing
+df.fillna(df.mean(), inplace=True)  # Handling missing values
+
+# Encode categorical variables (like nativeLanguage, city, country)
+df_encoded = pd.get_dummies(df.drop('gender', axis=1), drop_first=True)
+
+X = df_encoded  # Features after encoding
+y = df['gender']  # Target column
+
+# Debugging: Check the shape of processed data
+print("Data after encoding:")
+print(X.shape)
+
+# Standardize features
+scaler = StandardScaler()
+X = scaler.fit_transform(X)
+
+print("Data Preprocessing Done")
+
+# Step 3: Split the Data
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+print("Data Splitting Done")
+
+# Step 4: Define the Model
+model = LogisticRegression()
+
+# Step 5: Fine-Tuning the Model with GridSearchCV
+param_grid = {
+    'C': [0.01, 0.1, 1, 10, 100],  # Regularization strength
+    'penalty': ['l1', 'l2'],  # Regularization type
+    'solver': ['liblinear', 'saga'],  # Solvers that support the specified penalties
+    'max_iter': [100, 200, 300]  # Maximum number of iterations
+}
+
+print("Starting Grid Search...")
+# Grid Search
+grid_search = GridSearchCV(model, param_grid, cv=5, scoring='accuracy', n_jobs=-1)
+grid_search.fit(X_train, y_train)
+print("Grid Search Completed!")
+
+# Best parameters from grid search
+best_params = grid_search.best_params_
+print(f"Best Parameters: {best_params}")
+
+# Step 6: Train the Best Model
+best_model = grid_search.best_estimator_
+best_model.fit(X_train, y_train)
+
+# Step 7: Evaluate the Best Model
+y_pred = best_model.predict(X_test)
+accuracy = accuracy_score(y_test, y_pred)
+precision = precision_score(y_test, y_pred, average='weighted')
+recall = recall_score(y_test, y_pred, average='weighted')
+
+print(f'Accuracy: {accuracy}')
+print(f'Precision: {precision}')
+print(f'Recall: {recall}')
+print(f'Confusion Matrix:\n{confusion_matrix(y_test, y_pred)}')
